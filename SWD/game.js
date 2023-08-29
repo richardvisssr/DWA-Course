@@ -23,30 +23,22 @@ let map = {
   },
 };
 
-let currentLocation = player.location
 /**
  * Returns the items the player is carrying.
  * @returns {Array}
  */
 game.getInventory = () => {
-
   return player.items;
-
 };
+
 
 /**
  * Returns the list of items at the player's current location.
  * @returns {Array}
  */
 game.getItems = () => {
-  let item = []
-
-  if (currentLocation == map[currentLocation]){
-    item = map[currentLocation].items
-  }
-
-   return item
-
+  const currentLocation = player.location;
+  return map[currentLocation].items;
 };
 
 /**
@@ -55,12 +47,13 @@ game.getItems = () => {
  * @returns {Object}
  */
 game.getLocationInformation = () => {
-  let exits = {
+  const currentLocation = player.location;
+  let exit = {
     exit: map[currentLocation].exits,
     description: map[currentLocation].description
   };
 
-  return exits;
+  return exit;
 };
 
 
@@ -74,10 +67,16 @@ game.getLocationInformation = () => {
  * @returns {String} - The location the player is in after executing this function
  */
 game.goToLocation = (locationName) => {
-  if (player.location in locationName) {
-    return locationName
+  const currentLocation = player.location;
+
+  if (map[currentLocation].exits.includes(locationName)) {
+    player.location = locationName;
+    return locationName;
+  } else {
+    return currentLocation;
   }
 };
+
 
 /**
  * Checks if the item with the given itemName is in the list of
@@ -89,9 +88,17 @@ game.goToLocation = (locationName) => {
  * the string 'nothing'
  */
 game.takeItem = (itemName) => {
-  if (itemName in map[player.location].items) {
-    return itemName
-  } else return 'nothing'
+  const currentLocation = player.location;
+  const itemsAtLocation = map[currentLocation].items;
+
+  if (itemsAtLocation.includes(itemName)) {
+    const itemIndex = itemsAtLocation.indexOf(itemName);
+    player.items.push(itemsAtLocation.splice(itemIndex, 1)[0]);
+    return itemName;
+  } else {
+    return 'nothing';
+  }
 };
+
 
 module.exports = game;
