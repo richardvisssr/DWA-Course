@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite App</title>
+    <!-- Fonts -->
+    <!-- Gloock & Nanum -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gloock&family=Nanum+Gothic:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- End Fonts -->
+  </head>
+  <body>
+    <header>
+      <h1>Hanstagram</h1>
+    </header>
+    <section>
+      <form action="">
+        <h2>Share new photo</h2>
+        <label for="photo"
+          >Photo URL (e.g.
+          https://live.staticflickr.com/65535/52686939028_884bf96844_q_d.jpg):</label
+        >
+        <input type="text" name="photo" id="photo" />
+        <label for="caption">Caption:</label>
+        <input type="text" name="caption" id="caption" />
+        <button id="submit">Share! 🎉</button>
+      </form>
+    </section>
+    <section id="posts">
+      <!-- start image post component-->
+      <article class="post">
+        <div class="avatar">
+          <div>
+            <img src="img/avatar.jpg" alt="avatar" />
+          </div>
+          <div>
+            <h3>fritzvd</h3>
+          </div>
+        </div>
+        <div class="image-post">
+          <img src="http://mrmrs.github.io/photos/002.jpg" alt="starry night" />
+        </div>
+        <div class="caption">
+          <h3 class=""><span class="heart"></span>fritzvd</h3>
+          <p class="pa1">Stars!</p>
+        </div>
+      </article>
+      <!-- stop image post component -->
+    </section>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
