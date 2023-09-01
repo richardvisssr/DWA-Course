@@ -48,12 +48,12 @@ game.getItems = () => {
  */
 game.getLocationInformation = () => {
   const currentLocation = player.location;
-  let exit = {
-    exit: map[currentLocation].exits,
+  let result = {
+    exits: map[currentLocation].exits,
     description: map[currentLocation].description
   };
 
-  return exit;
+  return result;
 };
 
 

@@ -72,7 +72,7 @@ function execute(command, argument) {
     case "look":
     case "l":
       response = "you've found";
-      const items = game.getItems();
+      const items = game.getwItems();
       if (items.length === 0) {
         response += " no items at al";
       } else {
