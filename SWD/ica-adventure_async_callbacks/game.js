@@ -39,6 +39,13 @@ let map = {
  */
 game.goToLocation = (locationName, done) => {
     //PART A)
+    request(`http://localhost:3000/${locationName}`, (err, body) => {
+        if (err){
+            return done(err, null);
+        }else {
+            done(null, locationDescription);
+        }
+}); 
 };
 
 /**
