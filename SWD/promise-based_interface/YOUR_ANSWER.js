@@ -2,12 +2,15 @@ const fs = require('fs');
 
 //Definitie van de promise-based interface voor readFile
 function readFileP(file) {
-    return new Promise((resolve, reject) => {
-        /*
-        
-            Schrijf hier je oplossing
-        
-        */
+    return new Promise((resolve, reject) => {   
+            file.readFileP(file, 'utf8', (err, data) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(data);
+                }
+            });
+
     });
 }
 
