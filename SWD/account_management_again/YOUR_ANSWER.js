@@ -15,7 +15,13 @@ users = [
     }
 ];
 
-pw.writeFileP(Promise.all([users]).then(() => {
+// pw.writeFileP(Promise.all([users]).then(() => {
+//     console.log('done');
+// }).catch(err => {
+//     console.log(err.message);
+// })); 
+
+pw.readFileP(Promise.all([users]).then(() => {
     console.log('done');
 }).catch(err => {
     console.log(err.message);
