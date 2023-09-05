@@ -47,7 +47,7 @@ game.goToLocation = (locationName, done) => {
             if (err){
                 return done(err, null);
             }else {
-                const location = JSON.parse(body);
+                const location = JSON.parse(bo-dy);
                 
                 map[locationName] = {
                     description: location.description,
