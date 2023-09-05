@@ -1,23 +1,23 @@
 /* A */
 
-// let doAllTasks = (printWhenFinished) => {
-//     setTimeout(() => {
-//         console.log('Taak 1 klaar');
-//         setTimeout(() => {
-//             console.log('Taak 2 klaar');
-//             printWhenFinished();
-//         }, Math.random() * 100);
-//     }, Math.random() * 100);    
-// };
+let doAllTasks = (printWhenFinished) => {
+    setTimeout(() => {
+        console.log('Taak 1 klaar');
+        setTimeout(() => {
+            console.log('Taak 2 klaar');
+            printWhenFinished();
+        }, Math.random() * 100);
+    }, Math.random() * 100);    
+};
 
-// /* B */
+/* B */
 
-// let printWhenFinished = () => {
-//     console.log('Alle taken klaar');
-//     console.log('nu gaan we andere dingen doen');
-// };
+let printWhenFinished = () => {
+    console.log('Alle taken klaar');
+    console.log('nu gaan we andere dingen doen');
+};
 
-// doAllTasks(printWhenFinished);
+doAllTasks(printWhenFinished);
 
 /* C */
 

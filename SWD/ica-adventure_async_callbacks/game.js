@@ -39,20 +39,36 @@ let map = {
  */
 game.goToLocation = (locationName, done) => {
     //PART A)
-    request(`http://localhost:3000/${locationName}`, (err, body) => {
-        if (err){
-            return done(err, null);
-        }else {
-            done(null, locationDescription);
-        }
-}); 
+
+    if (map[locationName].exits.includes(locationName)) {
+            return done(null, locationDescription);
+        } else {
+        request(`http://localhost:3000/${locationName}`, (err, response, body) => {
+            if (err){
+                return done(err, null);
+            }else {
+                const location = JSON.parse(body);
+                
+                map[locationName] = {
+                    description: location.description,
+                    items: location.items,
+                    exits: location.exits
+                }
+                
+                locationDescription = `you are in ${map[locationName].description}`;
+        return done(err, null);; 
+    };
+    });
 };
+}
+
 
 /**
  * Returns an object containing the description and the 
  * exits of the players current location on the map.
  * @returns {Object}
  */
+
 game.getLocationInformation = () => {
     const playerLocation = map[player.location];
     
