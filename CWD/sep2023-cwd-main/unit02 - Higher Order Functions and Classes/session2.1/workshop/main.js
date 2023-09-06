@@ -8,13 +8,15 @@ window.onload = function initializeApp() {
   // The form-validator uses functions to check if a field has valid input.
   // This object defines which checker functions work for which form fields.
   const theFormCheckers = {
-    achternaam: isRequired, // isRequired is a checker defined in formValidation.js
-    postcode: isaPostCode,  // isaPostCode is a checker defined in this file.
-    huisnummer: isRequired
-  };
+    voornaam:   message(hasMaxLength(20),"Lange voornamen passen niet op het vliegticket"),
+    achternaam: hasMaxLength(20),  
+    postcode:   message(isaPostCode, "Dit moeten vier cijfers, en dan twee letters zijn"),  
+    huisnummer: message(isRequired, "Wat jammer dat er geen huisnummer is :-(")
+  }
+
   theForm.addEventListener(
     "submit",
-    makeFormValidator(theFormCheckers, handleFormSubmit)
+    makeFormValidator(theFormCheckers, handleFormSubmit, handleErrors)
   );
 };
 
@@ -25,6 +27,28 @@ function handleFormSubmit() {
   );
 }
 
+function handleErrors(checkerFailures) {
+  theErrorReport.hidden = false;
+  const errorList = document.getElementById("error-messages");
+  errorList.innerHTML = ""
+
+  checkerFailures.map(([name, failure]) => {
+    if (failure !== false) {
+      return [name, failure];
+    } else {
+      return [name, "Dit veld is niet correct ingevuld"];
+    }
+  }).map(([name, message]) => {
+    const messageHtml = `<b>${name}:</b> ` + message;
+    return messageHtml;
+  }).map(messageHtml => {
+    const listItem = document.createElement("li");
+    listItem.innerHTML = messageHtml;
+    return listItem;
+  }).forEach(item => {
+    errorList.appendChild(item);
+  });
+}
 
 // This is a checker function that is used by the validator library.
 function isaPostCode(value) {
@@ -40,3 +64,63 @@ function isaPostCode(value) {
   console.log(`Checked postcode «${value}»:`, result);
   return result;
 }
+
+function hasMaxLength(maxLength) {
+  return function (value) {
+  // Verwijder voor- en achterliggende spaties van de waarde
+  value = value.trim();
+
+  // Definieer de maximale en minimale lengte voor validatie
+  const minLength = 3;
+
+  // Controleer of de lengte van de waarde binnen het gewenste bereik ligt
+  const length = value.length;
+  const result = length <= maxLength;
+
+  console.log(`Checked name "${value}":`, result);
+  return result;
+}
+}
+
+function hasMinimumLength(minLength) {
+  return function (value) {
+  // Verwijder voor- en achterliggende spaties van de waarde
+  value = value.trim();
+
+  // Definieer de maximale en minimale lengte voor validatie
+
+  // Controleer of de lengte van de waarde binnen het gewenste bereik ligt
+  const length = value.length;
+  const result = length >= minLength;
+
+  console.log(`Checked name "${value}":`, result);
+  return result;
+}
+}
+
+function checkBoth(checker1, checker2){
+  return function (value) {
+    return checker1(value) && checker2(value);
+  }
+}
+
+function message(checker, string){
+  return function (value) {
+    if (checker(value) == false) {
+      return string;
+    } else {
+      return true;
+    }
+  }
+}
+
+function optional(checker){
+  return function (value) {
+    if (value.trim() == "") {
+      return true;
+    } else {
+      return checker(value);
+    }
+  }
+}
+

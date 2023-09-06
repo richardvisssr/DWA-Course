@@ -8,7 +8,7 @@
 // makeFormValidator is a function that returns an event handler (a function).
 // The returned event handler will use the checkerFunctions as a set of functions to
 // validate form fields, and the submitHandler to call if everything is valid.
-function makeFormValidator(checkerFunctions, submitHandler) {
+function makeFormValidator(checkerFunctions, submitHandler, errorReporter) {
   // This function below is the actual form-validator that becomes an event handler
   // for form submissions.
   return function validator(event) {
@@ -28,29 +28,28 @@ function makeFormValidator(checkerFunctions, submitHandler) {
 
     console.log("---");
 
-    const allFieldsOK = fieldsArray.every(inputElement => {
-      const checkerFunction = checkerFunctions[inputElement.name];
-      // is there a check function defined for this field?
-      if (checkerFunction == undefined) {
-        return true;
-      } else {
-        const thisFieldOK = checkerFunction(inputElement.value);
-        console.log(`Checker-function on ${inputElement.name}:`, thisFieldOK);
-        return thisFieldOK;
-      }
+    const filterNoValidationFunction = fieldsArray.filter(inputElement => {
+      return checkerFunctions[inputElement.name] !== undefined;
     });
-
-    if (allFieldsOK) {
-      submitHandler()
+    const checkForValidation = filterNoValidationFunction.map(inputElement => {
+      const fieldName = inputElement.name
+      const checker = checkerFunctions[inputElement.name];
+      const checkResult = checker(inputElement.value)
+      return [fieldName, checkResult];
+    });
+    const Errors = checkForValidation.filter(([fName,result]) => result !== true);
+    
+    if (Errors.length == 0) {
+      submitHandler(); // Everything checked out OK, call success-callback.
     } else {
-      alert("Niet alle velden zijn correct ingevuld.");
+      errorReporter( Errors );
     }
-  };
+
+   };
 }
 
 // A checker function that simply checks if there is any input in the field.
 function isRequired(value) {
   const result = value.trim() != "";
-  console.log(`Checked required field «${value}»:`, result);
-  return result;
+  return result || "Dit veld moet ingevuld worden";
 }
