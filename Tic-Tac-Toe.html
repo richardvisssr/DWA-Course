@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 5px;
+    }
+    .cell {
+      width: 100px;
+      height: 100px;
+      font-size: 24px;
+      text-align: center;
+      vertical-align: middle;
+      cursor: pointer;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Boter, Kaas en Eieren</h1>
+  <div class="board" id="board"></div>
+  <p id="winner"></p>
+
+  <script>
+    const board = document.getElementById("board");
+    const cells = [];
+    const winnerMessage = document.getElementById("winner");
+
+    let currentPlayer = "X";
+    let winner = null;
+
+    // Maak het bord en de cellen
+    for (let i = 0; i < 9; i++) {
+      const cell = document.createElement("div");
+      cell.classList.add("cell");
+      cell.dataset.index = i;
+      cell.addEventListener("click", handleCellClick);
+      cells.push(cell);
+      board.appendChild(cell);
+    }
+
+    // Functie om een zet te verwerken
+    function handleCellClick(event) {
+      const cell = event.target;
+      const index = cell.dataset.index;
+
+      if (!cell.textContent && !winner) {
+        cell.textContent = currentPlayer;
+        checkWinner();
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
+      }
+    }
+
+    // Functie om de winnaar te controleren
+    function checkWinner() {
+      const winningCombinations = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+      ];
+
+      for (const combination of winningCombinations) {
+        const [a, b, c] = combination;
+        if (
+          cells[a].textContent &&
+          cells[a].textContent === cells[b].textContent &&
+          cells[a].textContent === cells[c].textContent
+        ) {
+          winner = cells[a].textContent;
+          winnerMessage.textContent = `Speler ${winner} wint!`;
+          return;
+        }
+      }
+
+      if (cells.every((cell) => cell.textContent)) {
+        winnerMessage.textContent = "Gelijkspel!";
+      }
+    }
+  </script>
+</body>
+</html>

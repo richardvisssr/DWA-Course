@@ -11,9 +11,67 @@ class Ufo extends BouncingSprite {
   }
 }
 
-/*
+class Player extends Sprite {
+  constructor() {
+    // Roep de constructor van de ouderklasse aan met de juiste parameters
+    super(rocketImageUrl, 60, 400, 0, 0);
+
+    // Initialisatie van de eigenschappen
+    this.xSpeed = 0;
+  }
+
+  moveLeft() {
+    this.xSpeed = -3;
+  }
+
+  moveRight() {
+    this.xSpeed = 3;
+  }
+
+  update() {
+    super.update(); // Roep de update-functie van de ouderklasse aan.
+    // Controleer of de speler de linkerrand (0) of rechterrand (gameWidth - width) heeft overschreden.
+    if (this.x < 0) {
+      this.x = 0;
+      this.xSpeed = 0; // Stop de beweging als de linkerrand wordt bereikt.
+    } else if (this.x > Sprite.gameWidth - this.width) {
+      this.x = Sprite.gameWidth - this.width;
+      this.xSpeed = 0; // Stop de beweging als de rechterrand wordt bereikt.
+    }
+
+    // Update de x-positie op basis van de huidige snelheid.
+    this.x += this.xSpeed;
+  }
+}
+
+class Bullit extends CollidingSprite {
+  constructor(x, y) {
+    super(bullitImageUrl, x, y, 0, -5);
+  }
+
+  update() {
+    super.update();
+    if (this.y < 0) {
+      this.remove();
+    }
+}
+
+  isCollision(otherSprite) {
+    if (this.x < otherSprite.x + otherSprite.width && this.x + this.width > otherSprite.x && this.y < otherSprite.y + otherSprite.height && this.y + this.height > otherSprite.y) {
+      return otherSprite instanceof Ufo;
+    } else {  
+      return false;
+    }
+  }
+
+  handleCollisionWith(otherSprite) {
+      this.remove();
+      otherSprite.remove();
+  }
+}
+
 let player; // Deze variabele moet globaal zijn. Waarom?
-*/
+
 
 function createGameSprites() {
   const allUfos = [
@@ -32,7 +90,7 @@ function createGameSprites() {
   // bij, en gebruikt die lijst om alle Sprites periodiek een
   // update() te laten doen.
 
-  /* player = new Player(); */
+  player = new Player(); // maak een nieuwe speler aan
 }
 
 function installKeyboardHandler() {
@@ -48,7 +106,12 @@ function installKeyboardHandler() {
       // drukt. preventDefault() voorkomt dat.
       event.preventDefault();
 
-      /* new Bullit( ??, ?? ); */
+    new Bullit(player.x + player.width / 2, player.y);
+    }
+    if (event.code == "ArrowLeft") {
+      player.moveLeft();  
+    } else if (event.code == "ArrowRight") {
+      player.moveRight();
     }
   });
 }
