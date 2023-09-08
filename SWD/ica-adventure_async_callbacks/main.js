@@ -31,7 +31,8 @@ rl.on('line', (line) => {
         console.log(result);     
         return rl.prompt();
     });
-}).on('close', function () {
+}
+).on('close', function () {
    //DEFAULT ^c
    console.log('Leaving the game');
    process.exit(0);

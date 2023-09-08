@@ -2,6 +2,7 @@
 
 const readline = require('readline');
 const game = require('./game');
+const { error } = require('console');
 
 const rl = readline.createInterface(process.stdin, process.stdout);
 
@@ -13,10 +14,21 @@ rl.prompt();
 rl.on('line', (line) => {
     const [command, argument] = line.trim().split(' ');
     execute(command, argument).then(result => {
-        //A)
+        //A)`Zorg ervoor dat het resultaat van de aanroep van `execute` naar de console wordt geschreven. Als er een fout optreedt, 
+        //controleer dan of de property `code` van deze fout gelijk is aan `COMMAND_ERROR`. 
+        //Als dit zo is, dan kun je de `message` van de fout naar de console schrijven, 
+        //anders kun je de error opnieuw gooien (waarmee je het programma laat crashen). 
+        //Test de implementatie door het spel te runnen en het command `where`, of `w` te geven. 
+        //Vergeet niet de map_server.js 'aan' te zetten.
+        console.log(result);
 
-
-    });
+}).catch(err => {
+    if (err.code === COMMAND_ERROR) {
+        console.log(err.message);
+    } else {
+        throw err.error;
+    }
+});
 
 }).on('close', function () {
    //DEFAULT ^c
@@ -41,7 +53,10 @@ function execute(command, argument) {
             });
         case 'goto':
         case 'g':
-            //C)
+            return game.goToLocation(argument).then(locationDescription => {
+                response = `you are in ${locationDescription}`;
+                return Promise.resolve(response);
+            });
         default:
             let err = new Error(`The input: '${command}' is not defined`)
             err.code = COMMAND_ERROR;
