@@ -32,10 +32,36 @@ let map = {
  * 
  */
 game.goToLocation = locationName => {
-    //B)
+    return new Promise((resolve, reject) => {
+        if (!map[locationName]) {
+          request.get('http://localhost:3000/' + locationName, (err, res, body) => {
+            if (err || locationName === 'undefined') {
+              reject('err'); // Reject met de fout
+            } else {
+              const location = JSON.parse(body);
     
-};
-
+              // Voeg de locatie toe aan de map
+              map[locationName] = {
+                description: location.description,
+                items: location.items,
+                exits: location.exits
+              };
+    
+              // Stel de spelerlocatie in
+              player.location = locationName;
+    
+              // Resolve met de beschrijving van de locatie
+              resolve(location.description);
+            }
+          });
+        } else {
+          // Als de locatie al in de map staat, stel de spelerlocatie in en resolve met de beschrijving
+          player.location = locationName;
+          resolve(map[locationName].description);
+        }
+      });
+    };
+    
 /**
  * Returns an object containing the description and the 
  * exits of the players current location on the map.

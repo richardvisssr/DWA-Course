@@ -12,8 +12,17 @@ rl.prompt();
 
 rl.on('line', (line) => {
     const [command, argument] = line.trim().split(' ');
-    //A) 
-    //Plaats hier de promise implementatie. 
+    execute(command, argument).then(result => {
+        console.log(result);
+        //Kan geen await/async gebruiken omdat de functie execute niet async is
+
+}).catch(err => {
+    if (err.code === COMMAND_ERROR) {
+        console.log(err.message);
+    } else {
+        throw err.error;
+    }
+});
 
 }).on('close', function () {
    //DEFAULT ^c
