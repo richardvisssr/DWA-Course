@@ -72,9 +72,8 @@ function execute(command, argument, next) {
             // ---------------------- PART B) -----------------------------//
             //Below is the old synchronous code, but game.goToLocation is 
             //asynchronous now. Replace this code.
-            const locationDescription = game.goToLocation(argument);
-            response = `you are in ${locationDescription}`;
-            return response;
+            game.goToLocation(argument, next);
+
             // -------------------------------------------------------------//
         default:
             //Here you can see also see how we  deal with errors.
