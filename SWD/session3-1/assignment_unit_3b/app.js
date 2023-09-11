@@ -20,12 +20,22 @@ app.get('/action/:player/where', async (req, res) => {
 });
 
 app.post('/action/:player/goto/:location', async (req, res) => {
-   //TODO
-   const player = req.params.player;
-   const locationName = path.join(`${req.params.player}.json`);
-   locationDescription = await game.goToLocation(locationName);
-   const locationInformation = await game.getLocationInformation();
-   res.json(locationInformation);
+    try {
+        const player = req.params.player;
+        const locationName = req.params.location; // Haal de locatie uit de routeparameter
+        const game = new Game(); // Maak een nieuw Game-object aan
+
+        // Roep de goToLocation-functie van de Game-klasse aan om de locatie te wijzigen
+        const locationDescription = await game.goToLocation(locationName);
+
+        // Roep getLocationInformation-functie aan om informatie over de nieuwe locatie op te halen
+        const locationInformation = await game.getLocationInformation(player);
+
+        // Stuur de beschrijving van de nieuwe locatie als JSON-respons
+        res.json(locationInformation);
+    } catch (error) {
+        res.status(500).json({ error: 'Er is een fout opgetreden bij het verplaatsen naar de nieuwe locatie.' });
+    }
 });
 
 const server = app.listen(3000, () => {
