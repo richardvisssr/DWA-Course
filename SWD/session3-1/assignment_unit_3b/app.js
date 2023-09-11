@@ -21,7 +21,11 @@ app.get('/action/:player/where', async (req, res) => {
 
 app.post('/action/:player/goto', async (req, res) => {
    //TODO
-   
+   const player = req.params.player;
+   const locationName = path.join(`${req.params.player}.json`);
+   locationDescription = await game.goToLocation(locationName);
+   const locationInformation = await game.getLocationInformation();
+   res.json(locationInformation);
 });
 
 const server = app.listen(3000, () => {

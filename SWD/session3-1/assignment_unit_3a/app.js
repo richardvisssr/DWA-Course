@@ -11,9 +11,9 @@ app.get('/action/where', async (req, res) => {
     res.json(locationInformation);
 });
 
-app.post('/action/goto', async (req, res) => {
+app.post('/action/goto/:location', async (req, res) => {
     //TODO A2)
-    const locationName = req.query.location;
+    const locationName = req.params.location;
     const locationDesription = await game.goToLocation(locationName);
     res.json(locationDesription);
 });
