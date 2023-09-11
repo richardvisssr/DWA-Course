@@ -19,7 +19,7 @@ app.get('/action/:player/where', async (req, res) => {
     res.json(locationInformation);
 });
 
-app.post('/action/:player/goto', async (req, res) => {
+app.post('/action/:player/goto/:location', async (req, res) => {
    //TODO
    const player = req.params.player;
    const locationName = path.join(`${req.params.player}.json`);
