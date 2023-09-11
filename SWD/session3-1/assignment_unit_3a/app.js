@@ -1,4 +1,4 @@
-'use strict';
+    'use strict';
 
 const express = require('express');
 const game = require('./game.js');
@@ -13,6 +13,9 @@ app.get('/action/where', async (req, res) => {
 
 app.post('/action/goto', async (req, res) => {
     //TODO A2)
+    const locationName = req.query.location;
+    const locationDesription = await game.goToLocation(locationName);
+    res.json(locationDesription);
 });
 
 const server = app.listen(3000, () => {

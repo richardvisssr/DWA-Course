@@ -1,6 +1,23 @@
-const express = require('express')
-const app = express()
+const express = require('express');
+const app = express();
+const port = 3000;
 
-app.get('/', (req, res) => res.send('Hello World!'))
+// Initialize the request counter
+let nRequests = 0;
 
-app.listen(3000, () => console.log('Example app listening on port 3000!'))
+// Middleware to increment the request counter
+app.use((req, res, next) => {
+  nRequests++; // Increment the counter for each request
+  console.log(`Request #${nRequests} received`);
+  next(); // Continue processing the request
+});
+
+// Your routes and other middleware go here
+
+app.get('/', (req, res) => {
+  res.send('Hello, World!');
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});

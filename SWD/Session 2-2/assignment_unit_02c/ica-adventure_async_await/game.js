@@ -31,7 +31,7 @@ let map = {
  * received json is not valid.
  * 
  */
-game.goToLocation = locationName => {
+game.goToLocation = async locationName => {
     return new Promise((resolve, reject) => {
         if (!map[locationName]) {
           request.get('http://localhost:3000/' + locationName, (err, res, body) => {
