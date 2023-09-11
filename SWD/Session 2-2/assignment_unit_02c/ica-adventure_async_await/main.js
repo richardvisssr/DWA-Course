@@ -47,7 +47,19 @@ async function execute(command, argument) {
             
         case 'goto':
         case 'g':
-            //C
+            if (argument === null || argument === undefined) {
+                let err = new Error(`The input '${command}' needs an argument`)
+                err.code = COMMAND_ERROR;
+                return Promise.reject(err);
+            }
+            try {
+            let locationDescription = await game.goToLocation(argument);
+            
+            response = `you are in ${locationDescription}`;
+            return response;
+            } catch (error) {
+                console.error('Er is een fout opgetreden:', error);
+            }
         default:
             let err = new Error(`The input: '${command}' is not defined`)
             err.code = COMMAND_ERROR;

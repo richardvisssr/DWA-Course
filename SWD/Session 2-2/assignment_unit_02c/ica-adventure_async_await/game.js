@@ -31,36 +31,31 @@ let map = {
  * received json is not valid.
  * 
  */
-game.goToLocation = async locationName => {
-    return new Promise((resolve, reject) => {
-        if (!map[locationName]) {
-          request.get('http://localhost:3000/' + locationName, (err, res, body) => {
-            if (err || locationName === 'undefined') {
-              reject('err'); // Reject met de fout
-            } else {
-              const location = JSON.parse(body);
-    
-              // Voeg de locatie toe aan de map
-              map[locationName] = {
-                description: location.description,
-                items: location.items,
-                exits: location.exits
-              };
-    
-              // Stel de spelerlocatie in
-              player.location = locationName;
-    
-              // Resolve met de beschrijving van de locatie
-              resolve(location.description);
-            }
-          });
-        } else {
-          // Als de locatie al in de map staat, stel de spelerlocatie in en resolve met de beschrijving
-          player.location = locationName;
-          resolve(map[locationName].description);
+  game.goToLocation = async locationName => {
+    if (map[player.location].exits.includes(locationName)) {
+        if (map.hasOwnProperty(locationName)) {
+            player.location = locationName;
+            return map[player.location].description;
         }
-      });
-    };
+        else {
+          try {
+            let response = await fetch(`http://localhost:3000/${locationName}`);
+            location = await response.json();
+
+            map[locationName] = location;           
+            player.location = locationName;
+
+            return map[player.location].description;
+        } catch (error) {
+            console.error('Er is een fout opgetreden:', error);
+        }
+    }
+  }
+    else {
+        return map[player.location].description;
+    }
+    
+  };
     
 /**
  * Returns an object containing the description and the 
