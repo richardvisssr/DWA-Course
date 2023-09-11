@@ -14,20 +14,25 @@ app.use(bodyParser.json());
 
 const gameFileReader = async (req, res, next) => {
   //TODO D1, D2
+ try {
+  const fileName = path.join(gameFilesFolderName, `${req.params.player}.json`);
+  const fileContent = await promiseWrappers.readFileP(fileName);
+  req.gameState = JSON.parse(fileContent);
+  next();
+} catch (error) {
+  res.status(500).json({ error: 'something horrible happened' });
+}
 } 
 
-app.use(/* TODO D1 */);
+app.use(gameFileReader);
 
 
 const gameStateReader; //TODO D3
 
 app.get('/action/:player/where', async (req, res) => {
-    const fileName = path.join(gameFilesFolderName, `${req.params.player}.json`);
-    const fileContent = await promiseWrappers.readFileP(fileName);
-    const gameState = JSON.parse(fileContent);
-    const game = new Game(gameState);
-    const locationInformation = await game.getLocationInformation();
-    res.json(locationInformation);
+  const game = new Game(req.gameState);
+  const locationInformation = await game.getLocationInformation();
+  res.json(locationInformation);
 });
 
 
