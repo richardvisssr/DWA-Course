@@ -19,20 +19,18 @@ app.get('/action/:player/where', async (req, res) => {
     res.json(locationInformation);
 });
 
-app.post('/action/:player/goto/:location', async (req, res) => {
+app.post('/action/:player/goto/', async (req, res) => {
     try {
-        const player = req.params.player;
-        const locationName = req.params.location; // Haal de locatie uit de routeparameter
-        const game = new Game(); // Maak een nieuw Game-object aan
-
+        const fileName = path.join(gameFilesFolderName, `${req.params.player}.json`);
+        const fileContent = await promiseWrappers.readFileP(fileName);
+        const gameState = JSON.parse(fileContent);
+        const game = new Game(gameState); // Maak een nieuw Game-object aan met de opgeslagen spelstatus
+        const locationName = req.query.location; // Haal de locatie uit de routeparameter
         // Roep de goToLocation-functie van de Game-klasse aan om de locatie te wijzigen
-        const locationDescription = await game.goToLocation(locationName);
-
-        // Roep getLocationInformation-functie aan om informatie over de nieuwe locatie op te halen
-        const locationInformation = await game.getLocationInformation(player);
+        const locationDescription = game.state.player.location = await game.goToLocation(locationName);
 
         // Stuur de beschrijving van de nieuwe locatie als JSON-respons
-        res.json(locationInformation);
+        res.json(locationDescription);
     } catch (error) {
         res.status(500).json({ error: 'Er is een fout opgetreden bij het verplaatsen naar de nieuwe locatie.' });
     }
