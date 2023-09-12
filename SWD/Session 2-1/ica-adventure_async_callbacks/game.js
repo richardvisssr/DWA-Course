@@ -41,39 +41,30 @@ let map = {
 game.goToLocation = (locationName, done) => {
     //PART A)
 
-    if(!map[locationName]){
-      request.get('http://localhost:3000/' + locationName, (err, res, body) => {
-        if (err) {
-          return done(err, null); // Geef een fout door aan de callback
-        }
-  
-        try {
+    if(map[player.location].exits.includes(locationName)){
+        if (map.hasOwnProperty(locationName)) {
+          player.location = locationName;
+          return done(null, locationName.description);
+        }else{
+          request.get('http://localhost:3000/' + locationName, (err, res, body) => {
           const location = JSON.parse(body);
           
-          // Voeg de locatie toe aan de map
           map[locationName] = {
             description: location.description,
             items: location.items,
             exits: location.exits
           };
           
-  
-          // Stel de spelerlocatie in
           player.location = locationName;
   
-          // Geef de beschrijving van de locatie door aan de callback
           done(null, location.description);
-        } catch (parseError) {
-          done(parseError); // Geef een fout door aan de callback als de JSON-analyse mislukt
-        }
-      });
-    } else {
-      // Als de locatie al in de map staat, stel de spelerlocatie in en geef de beschrijving door
-      player.location = locationName;
-      done(null, map[locationName].description);
-    }
-  };
 
+        });
+      }
+    }else{
+      done(null, locationName.description);
+    }
+};
 /**
  * Returns an object containing the description and the 
  * exits of the players current location on the map.
