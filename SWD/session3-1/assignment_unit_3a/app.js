@@ -13,7 +13,7 @@ app.get('/action/where', async (req, res) => {
 
 app.post('/action/goto/', async (req, res) => {
     //TODO A2)
-    const locationName = req.params.location;
+    const locationName = req.query.location;
     const locationDesription = await game.goToLocation(locationName);
     res.json(locationDesription);
 });
