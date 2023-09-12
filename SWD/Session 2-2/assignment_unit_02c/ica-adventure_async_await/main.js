@@ -53,7 +53,7 @@ async function execute(command, argument) {
                 return Promise.reject(err);
             }
             try {
-            let locationDescription = await game.goToLocation(argument);
+            let locationDescription = game.goToLocation(argument);
             
             response = `you are in ${locationDescription}`;
             return response;
