@@ -130,3 +130,16 @@ a {
   padding: 0rem 0.4rem;
   color: #ccc;
 }
+
+/* Add these styles to your CSS file */
+.app-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.app-column {
+  width: 48%; /* Adjust the width as needed */
+  box-sizing: border-box;
+  padding: 20px;
+  border: 1px solid #ccc; /* Add a border for separation */
+}

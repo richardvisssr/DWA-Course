@@ -1,14 +1,20 @@
-/* eslint-disable react/prop-types */
-import ListItem from "./ListItem";
+// ItemList.jsx
+import ListItem from "./ListItem"; // Assuming ListItem is in the same directory
 
-export default function ItemList(props) {
-  // console.log(props.newsItem.items);
-  console.log(props);
+function ItemList(props) {
   return (
-    <div className="ItemList">
-      {props.newsItem.items.map((item) => (
-        <ListItem key={item.id} newsItem={item} />
+    <div>
+      {props.items.map((item) => (
+        <ListItem
+          key={item.id}
+          item={item}
+          onClick={() => {
+            props.onSelectedItem(item.url);
+          }}
+        />
       ))}
     </div>
   );
 }
+
+export default ItemList;
