@@ -6,7 +6,7 @@ router.post("/register", async (req, res) => {
   try {
     const player = req.body.player;
     const password = req.body.password;
-    const playerFile = `game_files/${player}.json`;
+    const playerFile = `player_files/${player}.json`;
     const file = await promiseWrappers.writeFileP(
       playerFile,
       JSON.stringify({ password: password })
@@ -21,11 +21,12 @@ router.post("/login", async (req, res) => {
   try {
     const player = req.body.player;
     const password = req.body.password;
-    const playerFile = `game_files/${player}.json`;
+    const playerFile = `player_files/${player}.json`;
     const fileContent = await promiseWrappers.readFileP(playerFile);
     const file = JSON.parse(fileContent);
     if (file.password === password) {
-      res.json("Login");
+      req.session.player = "richard";
+      res.json("Sign In!");
     } else {
       res.json("Wrong password");
     }
@@ -38,7 +39,7 @@ router.post("/logout", async (req, res) => {
   try {
     const player = req.body.player;
     const password = req.body.password;
-    const playerFile = `game_files/${player}.json`;
+    const playerFile = `player_files/${player}.json`;
     const fileContent = await promiseWrappers.readFileP(playerFile);
     const file = JSON.parse(fileContent);
     if (file.password === password) {
