@@ -25,7 +25,7 @@ router.post("/login", async (req, res) => {
     const fileContent = await promiseWrappers.readFileP(playerFile);
     const file = JSON.parse(fileContent);
     if (file.password === password) {
-      req.session.player = "richard";
+      req.session.player = player;
       res.json("Sign In!");
     } else {
       res.json("Wrong password");

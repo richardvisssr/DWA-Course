@@ -10,17 +10,24 @@ path = require("path");
 const gameFilesFolderName = "game_files";
 
 const gameFileReader = async (req, res, next) => {
-  const fileName = path.join(gameFilesFolderName, `${req.params.player}.json`);
-  try {
-    const fileContent = await promiseWrappers.readFileP(fileName);
-    if (fileContent !== undefined && fileContent !== null) {
-      req.fileContent = fileContent;
-      next();
+  if (req.session.player) {
+    const fileName = path.join(gameFilesFolderName, `${req.session.player}.json`);
+    try {
+      const fileContent = await promiseWrappers.readFileP(fileName);
+      if (fileContent !== undefined && fileContent !== null) {
+        req.fileContent = fileContent;
+        next();
+      } else {
+        return res.status(400).send("File is empty or undefined.");
+      }
+    } catch (error) {
+      return res.status(500).send("Error reading the file." + fileName);
     }
-  } catch (error) {
-    return next(error);
+  } else {
+    return res.status(400).send("Player session not found.");
   }
 };
+
 
 router.use("/action/:player", gameFileReader);
 
@@ -50,7 +57,6 @@ const gameStateReader = async (req, res, next) => {
     next(error); // Pass errors to the default error handler
   }
 };
-
 
 router.get("/action/:player/where", gameStateReader, async (req, res) => {
   const locationInformation = await req.game.getLocationInformation();
