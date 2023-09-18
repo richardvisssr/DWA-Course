@@ -3,69 +3,72 @@ const express = require("express");
 const router = express.Router();
 const Game = require("../game.js");
 const promiseWrappers = require("../promise-wrappers");
+path = require("path");
+
+// const Game = require("../game");
+
+const gameFilesFolderName = "game_files";
+
+const gameFileReader = async (req, res, next) => {
+  const fileName = path.join(gameFilesFolderName, `${req.params.player}.json`);
+  try {
+    const fileContent = await promiseWrappers.readFileP(fileName);
+    if (fileContent !== undefined && fileContent !== null) {
+      req.fileContent = fileContent;
+      next();
+    }
+  } catch (error) {
+    return next(error);
+  }
+};
+
+router.use("/action/:player", gameFileReader);
+
+const errHandler = (err, req, res, next) => {
+  if (err.code === "ENOENT" && err.syscall === "open") {
+    res.status(404).json({ error: "Game not found." });
+  } else {
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+router.use("/action/:player", errHandler);
 
 const gameStateReader = async (req, res, next) => {
-    try {
-      // Check if req.fileContent is not undefined and is a non-empty string
-      if (typeof req.fileContent === 'string' && req.fileContent.trim() !== '') {
-        const gameState = JSON.parse(req.fileContent);
-        const game = new Game(gameState);
-        next();
-      } else {
-        // Handle the case where the JSON data is empty or undefined
-        throw new Error('Invalid JSON data');
-      }
-    } catch (error) {
-      next(error); // Pass errors to the default error handler
+  try {
+    // Check if req.fileContent is not undefined and is a non-empty string
+    if (typeof req.fileContent === "string" && req.fileContent.trim() !== "") {
+      const gameState = JSON.parse(req.fileContent);
+      const game = new Game(gameState); // Hier wordt "game" gedefinieerd
+      req.game = game; // Sla "game" op in req voor gebruik in andere route-handlers
+      next();
+    } else {
+      // Handle the case where the JSON data is empty or undefined
+      throw new Error("Invalid JSON data: " + req.fileContent);
     }
-  };
-  
-
-router.get("/listPlayerFiles", async (req, res) => {
-  try {
-    const files = await promiseWrappers.readdirP("game_files");
-    res.json(files);
   } catch (error) {
-    res.status(500).json({ error: "Er is een fout opgetreden." });
+    next(error); // Pass errors to the default error handler
   }
-});
+};
 
-router.delete("/deletePlayerFile/:player", async (req, res) => {
-  try {
-    const fileName = `game_files/${req.params.player}.json`;
-    const file = await promiseWrappers.unlinkFileP(fileName);
-    res.json(file);
-  } catch (error) {
-    res.status(500).json({ error: "Er is een fout opgetreden." });
-  }
-});
-
-router.post("/createPlayerFile/:player", async (req, res) => {
-  try {
-    const fileName = `game_files/${req.params.player}.json`;
-    const file = await promiseWrappers.writeFileP(fileName, "{}");
-    res.json(file);
-  } catch (error) {
-    res.status(500).json({ error: "Er is een fout opgetreden." });
-  }
-});
 
 router.get("/action/:player/where", gameStateReader, async (req, res) => {
-  const locationInformation = await game.getLocationInformation();
+  const locationInformation = await req.game.getLocationInformation();
   res.json(locationInformation);
 });
 
 router.post("/action/:player/goto", gameStateReader, async (req, res) => {
   const locationName = req.query.location;
-  const locationDescription = await game.goToLocation(locationName);
+  const locationDescription = await req.game.goToLocation(locationName);
   res.json(locationDescription);
 });
 
 router.post("/action/:player/arise", async (req, res) => {
   try {
     const game = new Game();
-    const body = req.body;
-    const newGame = await game.startNew(body.startLocation, body.inventory);
+    const startLocation = req.body.start;
+    const inventory = req.body.inventory;
+    const newGame = await game.startNew(startLocation, inventory);
     res.json(newGame);
   } catch (error) {
     res.status(500).json({ error: "Er is een fout opgetreden." });
