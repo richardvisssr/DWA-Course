@@ -37,16 +37,8 @@ router.post("/login", async (req, res) => {
 
 router.post("/logout", async (req, res) => {
   try {
-    const player = req.body.player;
-    const password = req.body.password;
-    const playerFile = `player_files/${player}.json`;
-    const fileContent = await promiseWrappers.readFileP(playerFile);
-    const file = JSON.parse(fileContent);
-    if (file.password === password) {
-      res.json("Logout");
-    } else {
-      res.json("Wrong password");
-    }
+    delete req.session.player;
+    res.json("Sign Out!");
   } catch (error) {
     res.status(500).json({ error: "Er is een fout opgetreden." });
   }
