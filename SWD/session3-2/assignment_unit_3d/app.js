@@ -2,12 +2,14 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
+const session = require("express-session");
 
 const game = require("./routes/games");
 const actionsRouter = require("./routes/actions");
 const register = require("./routes/players");
 
 app.use(bodyParser.json());
+app.use(session({ resave: true, saveUninitialized: true, secret: "secret" }));
 
 // Use the gameRouter for game file management routes
 app.use("/game", game);
