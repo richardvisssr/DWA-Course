@@ -1,3 +1,4 @@
+/* eslint-disable */
 function IFrameArea(props) {
   return (
     <div id="ItemPanel">

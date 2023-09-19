@@ -1,10 +1,10 @@
-// ItemList.jsx
+/* eslint-disable */
 import ListItem from "./ListItem"; // Assuming ListItem is in the same directory
 
 function ItemList(props) {
   return (
     <div>
-      {props.items.map((item) => (
+      {props.items.slice(0,props.listSize).map((item) => (
         <ListItem
           key={item.id}
           item={item}
