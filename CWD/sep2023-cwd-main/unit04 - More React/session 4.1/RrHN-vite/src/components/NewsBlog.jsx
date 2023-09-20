@@ -20,6 +20,7 @@ function NewsBlog(props) {
 
   function applyPreferences(color, listSize){
     setColor(color);
+    console.log(color);
     setListSize(listSize);
     handlePreferencesShown();
   }
@@ -69,6 +70,7 @@ function NewsBlog(props) {
         <div id="ListMainContent">
           {props.visibility ? (
             <PreferencesDialog
+              color={color}
               setColor={setColor}
               listSize={listSize}
               setListSize={setListSize}

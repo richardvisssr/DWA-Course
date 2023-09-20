@@ -29,11 +29,6 @@ function PreferencesDialog(props) {
     props.applyPreferences(color, value);
   };
 
-  const handleColorChange = (e) => {
-    const newColor = e.target.value;
-    setColor(newColor); // Bijwerken van de kleurstate
-    // props.setColor(newColor);
-  };
 
   return (
     <div id="react-root">
@@ -60,7 +55,7 @@ function PreferencesDialog(props) {
             </label>
             <label htmlFor="colorField">
               color:
-              <select id="colorField" onChange={handleColorChange} value={color}>
+              <select id="colorField" onChange={e => setColor(e.target.value)}>
                 <option value="orange">orange</option>
                 <option value="green">green</option>
                 <option value="brown">brown</option>
@@ -68,7 +63,7 @@ function PreferencesDialog(props) {
             </label>
             <div className="dialogButtons">
               <button onClick={handlePreferencesChange}>OK</button>
-              <button>Cancel</button>
+              <button onClick={handlePreferencesChange}>Cancel</button>
             </div>
           </div>
         </div>
