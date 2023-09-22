@@ -75,8 +75,9 @@ hnRoutes.get("/topstories", (request, response) => {
 app.use("/hn", hnRoutes);
 
 async function startServer() {
-  const client = await MongoClient.connect("mongodb://localhost:27017/RrHN", {
+  const client = await MongoClient.connect("mongodb://0.0.0.0/RrHN", {
     useNewUrlParser: true,
+    useUnifiedTopology: true,
   });
   const db = client.db("RrHN");
   const collection = db.collection("itemStatuses");
