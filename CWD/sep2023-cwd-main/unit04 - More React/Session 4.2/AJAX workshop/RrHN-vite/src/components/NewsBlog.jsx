@@ -34,7 +34,6 @@ function NewsBlog(props) {
     frontPageItems();
   }, []);
 
-
   const handleSelectedItem = (items) => {
     setIframeUrl(items);
   };
@@ -85,17 +84,20 @@ function NewsBlog(props) {
             </div>
             <button
               id="markAsSeen"
-              onClick={() =>
-                items.slice(0, listSize).map((item) => {
+              onClick={() => {
+                const updatedStatuses = {};
+
+                items.slice(0, listSize).forEach((item) => {
                   if (itemStatuses[item.id] === "") {
-                    setItemStatuses({
-                      ...itemStatuses,
-                      [item.id]: "seen",
-                    });
+                    updatedStatuses[item.id] = "seen";
                   }
-                  console.log(itemStatuses[item.id]);
-                })
-              }
+                });
+
+                setItemStatuses((prevStatuses) => ({
+                  ...prevStatuses,
+                  ...updatedStatuses,
+                }));
+              }}
             >
               Mark all items as &quot;seen&quot;
             </button>
