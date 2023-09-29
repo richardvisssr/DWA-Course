@@ -1,9 +1,13 @@
-alert(
-  "main.js is running, but does not do anything yet.\n" +
-    "Use main.js to write the code that connects to the server using WebSocket"
-);
-
-var wsConnection; // TODO Create a websocket and store it in this variable
+// alert(
+//   "main.js is running, but does not do anything yet.\n" +
+//     "Use main.js to write the code that connects to the server using WebSocket"
+// );
+const messageForm = document.getElementById("messageForm");
+const messageList = document.getElementById("messageList");
+const webSocket = new WebSocket("ws://localhost:3000/random", [
+  "protocolOne",
+  "protocolTwo",
+]);
 
 function sendData() {
   var dataObject = {
@@ -12,24 +16,33 @@ function sendData() {
   };
 
   //TODO Send the data to the server using the websocket
+  webSocket.send(JSON.stringify(dataObject));
 
   console.log("SENT DATA:", jsonStr);
 }
 
-wsConnection.onopen = function (arg) {
-  //TODO Complete this event handler
+webSocket.onopen = function (arg) {
+  const listItem = document.createElement("li");
+  listItem.textContent = "WebSocket connection opened";
+  messageList.appendChild(listItem);
 };
 
-wsConnection.onclose = function (arg) {
+webSocket.onclose = function (arg) {
   //TODO Complete this event handler
+  webSocket.send("connection is closed!")
 };
 
-wsConnection.onmessage = function (arg) {
+webSocket.onmessage = function (arg) {
   //TODO Complete this event handler
+  addMessageItem(JSON.stringify(dataObject.userName));
 };
 
-wsConnection.onerror = function (arg) {
+webSocket.onerror = function (arg) {
   //TODO Complete this event handler
+  const listItem = document.createElement("li");
+  listItem.textContent = "WebSocket connection was closed";
+  messageList.appendChild(listItem);
+
 };
 
 /**
