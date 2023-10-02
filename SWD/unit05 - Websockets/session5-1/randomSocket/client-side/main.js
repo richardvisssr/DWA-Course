@@ -34,7 +34,8 @@ webSocket.onclose = function (arg) {
 
 webSocket.onmessage = function (arg) {
   //TODO Complete this event handler
-  addMessageItem(JSON.stringify(dataObject.userName));
+  var data = JSON.parse(arg.data);
+  addMessageItem(data.userName + " : " + data.randomValue);
 };
 
 webSocket.onerror = function (arg) {
