@@ -4,13 +4,17 @@ import { useState } from "react";
 import frontPageItems from "../frontpageData";
 import ItemList from "./ItemList";
 import Preferences from "./Preferences";
+import { useDispatch, useSelector } from "react-redux";
+import { switchPanelView } from "../preferences.reducer";
 
 export default function App() {
+  const listSize = useSelector((state) => state.preferences.listSize);
+  const color = useSelector((state) => state.preferences.color);
+
   const [activeItemId, setActiveItemId] = useState(null);
   const [preferences, setPreferences] = useState({
-    active: false,
-    color: "orange",
-    listSize: 42,
+    color: color,
+    listSize: listSize,
   });
 
   const [items, setItems] = useState([]);
@@ -33,8 +37,11 @@ export default function App() {
   const savePrefs = (toBeSavedPreferences) =>
     setPreferences({ ...toBeSavedPreferences, active: false });
 
-  const togglePrefs = () =>
-    setPreferences({ ...preferences, active: !preferences.active });
+  // const togglePrefs = () =>
+  //   useSelector((state) => state.preferences.active)
+  //     ? setPreferences({ ...preferences, active: false })
+  //     : setPreferences({ ...preferences, active: true });
+
   return (
     <div className={`App ${preferences.color}`}>
       <ListPanel
@@ -42,7 +49,7 @@ export default function App() {
         items={items.slice(0, preferences.listSize)}
         activeItemId={activeItemId}
         selectItem={(id) => setActiveItemId(id)}
-        togglePrefs={togglePrefs}
+        // togglePrefs={togglePrefs}
       />
       <ContentPanel
         activeItem={activeItem}
@@ -54,30 +61,39 @@ export default function App() {
 }
 
 function ContentPanel(props) {
+  const activePrefsPanel = useSelector((state) => state.preferences.viewPanel);
+
   let currentPanel = <EmptyPanel />;
-  if (props.preferences.active) {
+
+  if (activePrefsPanel) {
     return (
       <Preferences
         preferences={props.preferences}
-        togglePrefs={props.togglePrefs}
+        // togglePrefs={props.togglePrefs}
         setPreferences={props.setPreferences}
       />
     );
-  } else if (props.activeItem !== "none") {
+  } else if (!activePrefsPanel) {
     return <ItemPanel activeItem={props.activeItem} />;
   }
   return currentPanel;
 }
 
-function ListHeader(props) {
+function ListHeader() {
+  const dispatch = useDispatch();
+  const color = useSelector((state) => state.preferences.color);
+
   return (
     <header id="ListHeader" className="panelHeader">
       <div className="Logo">
-        <div className={`colored ${props.color}`}>RRHN</div>
+        <div className={`colored ${color}`}>RRHN</div>
 
         <div className="title">Hacker News</div>
       </div>
-      <span className="settingsIcon" onClick={() => props.togglePrefs()}>
+      <span
+        className="settingsIcon"
+        onClick={() => dispatch(switchPanelView())}
+      >
         <svg
           width="20"
           height="20"
@@ -95,10 +111,7 @@ function ListPanel(props) {
   return (
     <div id="ListPanel">
       <div className="ItemList">
-        <ListHeader
-          color={props.preferences.color}
-          togglePrefs={props.togglePrefs}
-        />
+        <ListHeader />
         <ListFooter />
         <div id="ListMainContent">
           <ItemList items={props.items} selectItem={props.selectItem} />

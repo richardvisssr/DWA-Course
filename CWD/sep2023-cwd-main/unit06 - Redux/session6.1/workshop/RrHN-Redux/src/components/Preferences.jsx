@@ -1,21 +1,24 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { changeColor } from "../preferences.reducer";
+import { changeColor, changeListSize, switchPanelView } from "../preferences.reducer";
 
 export default function Preferences(props) {
   // extract the color from the reducer
+  const listSize = useSelector((state) => state.preferences.listSize);
   const color = useSelector((state) => state.preferences.color);
   // import dispatch to send changes to the reducer
   const dispatch = useDispatch();
 
   const [localPrefs, setLocalPrefs] = useState({
-    ...props.preferences,
+    listSize: listSize,
     color: color,
   });
 
   const setPrefs = (localPrefs) => {
     // send the change to the reducer
     dispatch(changeColor({ payload: localPrefs.color }));
+    dispatch(changeListSize({ payload: localPrefs.listSize }));
+    dispatch(switchPanelView());
     props.setPreferences(localPrefs);
   };
 
@@ -56,7 +59,7 @@ export default function Preferences(props) {
         </label>
         <div className="dialogButtons">
           <button onClick={() => setPrefs(localPrefs)}>OK</button>
-          <button onClick={() => props.togglePrefs()}>Cancel</button>
+          <button onClick={() => dispatch(switchPanelView())}>Cancel</button>
         </div>
       </div>
     </div>
