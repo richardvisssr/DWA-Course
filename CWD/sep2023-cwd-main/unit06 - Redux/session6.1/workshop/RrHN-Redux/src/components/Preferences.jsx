@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { changeColor, changeListSize, switchPanelView } from "../preferences.reducer";
+import {
+  changeColor,
+  changeListSize,
+  switchPanelView,
+} from "../reducers/preferences.reducer";
 
 export default function Preferences(props) {
   // extract the color from the reducer
@@ -16,12 +20,11 @@ export default function Preferences(props) {
 
   const setPrefs = (localPrefs) => {
     // send the change to the reducer
-    dispatch(changeColor({ payload: localPrefs.color }));
-    dispatch(changeListSize({ payload: localPrefs.listSize }));
+    dispatch(changeColor(localPrefs.color));
+    dispatch(changeListSize(localPrefs.listSize));
     dispatch(switchPanelView());
     props.setPreferences(localPrefs);
   };
-
   return (
     <div id="ItemPanel" className={`${localPrefs.color}`}>
       <div className="PreferencesDialog">

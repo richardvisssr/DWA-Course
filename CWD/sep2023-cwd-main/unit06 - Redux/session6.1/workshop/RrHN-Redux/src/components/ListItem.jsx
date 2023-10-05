@@ -1,7 +1,10 @@
 import { useEffect } from "react";
+import {  useSelector, useDispatch } from "react-redux";
+import { setActiveItemId } from "../reducers/listpanel.reducers";
 
 export default function ListItem(props) {
   const date = new Date(props.newsItem.time * 1000);
+  const dispatch = useDispatch(); 
 
   const sendReadItem = async (item) => {
     fetch(`http://localhost:3000/itemStatuses/${item.id}`, {
@@ -11,7 +14,7 @@ export default function ListItem(props) {
   };
 
   const selectNewsItem = async () => {
-    props.selectNewsItem(props.newsItem.id);
+    dispatch(setActiveItemId(props.newsItem.id));
     const response = await sendReadItem(props.newsItem);
     props.changeStatus(props.newsItem.id, "read");
   };

@@ -1,58 +1,44 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 
-import frontPageItems from "../frontpageData";
 import ItemList from "./ItemList";
 import Preferences from "./Preferences";
 import { useDispatch, useSelector } from "react-redux";
-import { switchPanelView } from "../preferences.reducer";
+import { switchPanelView } from "../reducers/preferences.reducer";
+import { fetchList } from "../reducers/listpanel.reducers";
 
 export default function App() {
   const listSize = useSelector((state) => state.preferences.listSize);
   const color = useSelector((state) => state.preferences.color);
-
-  const [activeItemId, setActiveItemId] = useState(null);
+  const items = useSelector((state) => state.listpanel.item);
+  const activeItem = useSelector((state) => state.listpanel.activeItem);
+  const activeItemId = useSelector((state) => state.listpanel.activeItemId);
   const [preferences, setPreferences] = useState({
     color: color,
     listSize: listSize,
   });
 
-  const [items, setItems] = useState([]);
-  const [activeItem, setActiveItem] = useState("none");
+console.log("activeItem", activeItem);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const getData = async () => {
-      const response = await fetch("http://localhost:3000/hn/topstories");
-      const data = await response.json();
-      setItems(Object.values(data));
-      Object.keys(data).forEach((i) => {
-        if (i === activeItemId) {
-          setActiveItem(data[i]);
-        }
-      });
-    };
-    getData();
-  }, []);
+    // Dispatch de fetchList actie wanneer de component mount
+    dispatch(fetchList());
+  }, [dispatch]);
 
   const savePrefs = (toBeSavedPreferences) =>
     setPreferences({ ...toBeSavedPreferences, active: false });
-
-  // const togglePrefs = () =>
-  //   useSelector((state) => state.preferences.active)
-  //     ? setPreferences({ ...preferences, active: false })
-  //     : setPreferences({ ...preferences, active: true });
 
   return (
     <div className={`App ${preferences.color}`}>
       <ListPanel
         preferences={preferences}
         items={items.slice(0, preferences.listSize)}
-        activeItemId={activeItemId}
-        selectItem={(id) => setActiveItemId(id)}
-        // togglePrefs={togglePrefs}
+        // selectItem={(id) => setActiveItemId(id)}
       />
       <ContentPanel
-        activeItem={activeItem}
+        // activeItem={activeItem}
         preferences={preferences}
         setPreferences={savePrefs}
       />
@@ -69,12 +55,11 @@ function ContentPanel(props) {
     return (
       <Preferences
         preferences={props.preferences}
-        // togglePrefs={props.togglePrefs}
         setPreferences={props.setPreferences}
       />
     );
   } else if (!activePrefsPanel) {
-    return <ItemPanel activeItem={props.activeItem} />;
+    return <ItemPanel />;
   }
   return currentPanel;
 }
@@ -114,7 +99,7 @@ function ListPanel(props) {
         <ListHeader />
         <ListFooter />
         <div id="ListMainContent">
-          <ItemList items={props.items} selectItem={props.selectItem} />
+          <ItemList items={props.items} />
         </div>
       </div>
     </div>
@@ -131,14 +116,11 @@ function EmptyPanel() {
   );
 }
 
-function ItemPanel(props) {
+function ItemPanel() {
+  const activeItem = useSelector((state) => state.listpanel.activeItem);
   return (
     <div id="ItemPanel">
-      <iframe
-        className="IFrameView"
-        src={props.activeItem.url}
-        frameBorder={0}
-      />
+      <iframe className="IFrameView" src={activeItem.url} frameBorder={0} />
     </div>
   );
 }

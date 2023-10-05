@@ -10,10 +10,13 @@ export const preferencesSlice = createSlice({
   reducers: {
     changeColor: (state, action) => ({ ...state, color: action.payload }),
     switchPanelView: (state) => ({ ...state, viewPanel: !state.viewPanel }),
-    changeListSize: (state, action) => ({
+    changeListSize: (state, action) => {
+      return      ({
       ...state,
       listSize: action.payload,
-    }),
+    })
+  
+  },
   },
 });
 
