@@ -4,7 +4,6 @@
   "main": "app.js",
   "dependencies": {
     "express": "^4.13.3",
-    "express-session": "^1.17.3",
     "ws": "^7.1.2"
   }
 }

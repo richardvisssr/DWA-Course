@@ -18,8 +18,6 @@ export default function App() {
     listSize: listSize,
   });
 
-console.log("activeItem", activeItem);
-
   const dispatch = useDispatch();
 
   useEffect(() => {
