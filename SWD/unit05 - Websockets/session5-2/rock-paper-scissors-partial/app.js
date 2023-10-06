@@ -4,31 +4,17 @@ const { createServer } = require("http");
 const { Server: WebSocketServer } = require("ws");
 
 const app = express();
-const http = createServer();
+const http = createServer(app);
 const wss = new WebSocketServer({ server: http });
 
-// code to setup the Express app (middleware, routes) can go here; eg:
 app.use(express.static(path.join(__dirname, "client-side")));
 
-// game logic
-//
-// params
-//  `myChoice` and `opponentChoice` must be a value of `'rock'|'paper'|'scissors'`
-// returns
-//  `undefined` when tie, `myChoice` if winner or `opponentChoice` if winner
-//
-// function playGame(choice1, choice2) {
-function playGame({ myChoice, opponentChoice }) {
+function playGame(myChoice, opponentChoice) {
   const rules = {
     rock: { scissors: true, paper: false },
     scissors: { rock: false, paper: true },
     paper: { rock: true, scissors: false },
   };
-
-  // turn choices into lowercase for 'key' lookup
-  [myChoice, opponentChoice] = [myChoice, opponentChoice].map((_) =>
-    _.toLowerCase()
-  );
 
   if (myChoice !== opponentChoice) {
     return rules[myChoice][opponentChoice] ? myChoice : opponentChoice;
@@ -36,104 +22,115 @@ function playGame({ myChoice, opponentChoice }) {
   return undefined;
 }
 
-// message-types for the client-server communication
-// prettier-ignore
 const messages = {
-  choiceAccepted    : (data) => ({ messageType: "CHOICE ACCEPTED"}),
-  choiceNotAccepted : (data) => ({ messageType: "CHOICE NOT ACCEPTED", ...data}),
-  opponentChoice    : (data) => ({ messageType: "OPPONENT CHOICE", ...data}),
-  win               : (data) => ({ messageType: "WIN", ...data}),
-  loose             : (data) => ({ messageType: "LOOSE", ...data}),
-  tie               : (data) => ({ messageType: "TIE"}),
-  opponentLeft      : (data) => ({ messageType: "OPPONENT LEFT", ...data}),
+  choiceAccepted: () => ({ messageType: "CHOICE ACCEPTED" }),
+  choiceNotAccepted: (reason) => ({
+    messageType: "CHOICE NOT ACCEPTED",
+    reason,
+  }),
+  opponentChoice: (opponentName) => ({
+    messageType: "OPPONENT CHOICE",
+    opponentName,
+  }),
+  win: (opponentName, opponentScore, ownScore) => ({
+    messageType: "WIN",
+    opponentName,
+    opponentScore,
+    ownScore,
+  }),
+  lose: (opponentName, opponentScore, ownScore) => ({
+    messageType: "LOSE",
+    opponentName,
+    opponentScore,
+    ownScore,
+  }),
+  tie: () => ({ messageType: "TIE" }),
+  opponentLeft: (opponentName) => ({
+    messageType: "OPPONENT LEFT",
+    opponentName,
+  }),
 };
 
-// send winner and loser to clients
-function declareWinner({ wsWinner, wsLoser }) {
-  const [winner, loser] = [wsWinner.state, wsLoser.state];
+function declareWinner(wsWinner, wsLoser) {
+  const winner = wsWinner.state;
+  const loser = wsLoser.state;
 
   winner.score++;
-  wsWinner.sendJSON(
-    messages.win({
-      opponentName: loser.userName,
-      opponentScore: loser.score,
-      ownScore: winner.score,
-    })
-  );
-  wsLoser.sendJSON(
-    messages.loose({
-      opponentName: winner.userName,
-      opponentScore: winner.score,
-      ownScore: loser.score,
-    })
-  );
+  wsWinner.sendJSON(messages.win(loser.userName, loser.score, winner.score));
+  wsLoser.sendJSON(messages.lose(winner.userName, winner.score, loser.score));
 }
 
-// send tie to clients
 function declareTie(wss) {
   wss.broadcast(messages.tie());
 }
 
-// code to setup event listeners for WebSocket communication can go here
-//
-// add `broadcast()` utility function to this `wss` WebSocketsServer
-wss.broadcast = (data) => wss.clients.forEach((_) => _.sendJSON(data));
+wss.broadcast = (data) => {
+  for (const client of wss.clients) {
+    client.sendJSON(data);
+  }
+};
 
-// WebSocketsServer on connection event
 wss.on("connection", (ws) => {
-  // add `sendJSON()` utility function to this `ws` WebSocket
   ws.sendJSON = (data) => {
     ws.send(JSON.stringify(data));
   };
 
-  //
-  // TODO: add `score`, `choice` and `userName` as 'state' to this `ws` Websocket
-  //
+  ws.state = {
+    score: 0,
+    choice: undefined,
+    userName: undefined,
+  };
 
-  // WebSocket on message event
   ws.on("message", (data) => {
-    //
-    // TODO: check if `choice` has already a value, if so,
-    //        send `choiceNotAccepted` and return
-    //
+    const parsedData = JSON.parse(data);
 
-    //
-    // TODO: parse `data` into `choice` and `userName` and keep 'state' updated,
-    //        send `choiceAccepted`
-    //
+    if (parsedData.messageType === "CHOICE ACCEPTED") {
+      return ws.sendJSON(
+        messages.choiceNotAccepted("You already made a choice")
+      );
+    }
 
-    //
-    // TODO: check if at least 2 clients are connected, if so,
-    //        send `opponentChoice` to opponent
-    //
-    if ( ... ) {
-      //
-      // TODO: check if opponent `choice` also has a value, if so, play the game
-      //
-      //        make use if possible of pre-declared functions, such as,
-      //        `playGame()`, `declareWinner()` and `declareTie()`
-      //
-      if ( ... ) {
+    ws.state.choice = parsedData.choice;
+    ws.state.userName = parsedData.userName;
 
-        //
-        // TODO: clear all `choice`'s from  all WebsocketServer's `clients`
-        //
+    ws.sendJSON(messages.choiceAccepted());
+
+    if (wss.clients.size >= 2) {
+      for (const client of wss.clients) {
+        if (client !== ws) {
+          client.sendJSON(messages.opponentChoice(ws.state.userName));
+        }
+      }
+    }
+
+    const opponent = [...wss.clients].find(
+      (client) => client !== ws && client.state.choice !== undefined
+    );
+
+    if (opponent) {
+      const winner = playGame(ws.state.choice, opponent.state.choice);
+      if (winner === undefined) {
+        declareTie(wss);
+      } else {
+        const wsWinner = winner === ws.state.choice ? ws : opponent;
+        const wsLoser = winner === ws.state.choice ? opponent : ws;
+        declareWinner(wsWinner, wsLoser);
+      }
+
+      for (const client of wss.clients) {
+        client.state.choice = undefined;
       }
     }
   });
 
-  // on WebSocket close event
   ws.on("close", () => {
-    console.log("[ws]   close");
-
-    if (ws.state.userName != undefined) {
-      wss.broadcast(messages.opponentLeft({ opponentName: ws.state.userName }));
+    console.log("[ws] close");
+    if (ws.state.userName !== undefined) {
+      wss.broadcast(messages.opponentLeft(ws.state.userName));
     }
   });
 });
 
-// connect the Express `app` to all incoming requests on the `http` server
-http.on("request", app);
 http.listen(3000, () => {
   console.log("The Server is listening on port 3000.");
 });
