@@ -13,15 +13,31 @@ const Location = mongoose.model("Location");
 //Don't forget to get your hands on the Location model when you need it.
 
 router.get("/:player/where", (req, res) => {
-  //1. find the correct player.
-  Player.findPlayerById(req.params.player)
+  Player.find({ _id: req.params.player })
     .then((player) => {
-      //2. call the correct method from the model.
-      return player.getLocationInformation();
+      if (!player) {
+        res.status(404).json({ message: "Player not found" });
+        return;
+      }
+      const currentLocation = player.currentLocation;
+      Location.find({ _id: currentLocation })
+        .then((location) => {
+          if (!location) {
+            res.status(404).json({ message: "Location not found" });
+            return;
+          }
+
+          res.json({
+            description: location.description,
+            exits: location.exits,
+          });
+        })
+        .catch((err) => {
+          res.status(500).json({ message: err.message });
+        });
     })
-    .then((locationInformation) => {
-      //3. send back the response.
-      res.json(locationInformation);
+    .catch((err) => {
+      res.status(500).json({ message: err.message });
     });
 });
 
