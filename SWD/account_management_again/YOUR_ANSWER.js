@@ -1,17 +1,28 @@
-const pw = require("./promise-wrappers");
-const fs = require("fs").promises;
+const pw = require('./promise-wrappers');
 
-// Eerst lezen we de gegevens uit 'users.json'
-pw.readFileP("users.json")
-  .then((data) => {
-    const users = JSON.parse(data);
+users = [
+    {
+        "account": "ashlee_waters",
+        "username": "ASH"
+    },
+    {
+        "account": "hilario_muller",
+        "username": "Hilario_Muller29"
+    },
+    {
+        "account": "serena_klein",
+        "username": "Serena.Klein"
+    }
+];
 
-    // Vervolgens schrijven we de gebruikersgegevens weg
-    return pw.writeFileP(users);
-  })
-  .then(() => {
-    console.log("Gebruikersgegevens zijn weggeschreven.");
-  })
-  .catch((err) => {
+// pw.writeFileP(Promise.all([users]).then(() => {
+//     console.log('done');
+// }).catch(err => {
+//     console.log(err.message);
+// })); 
+
+pw.readFileP(Promise.all([users]).then(() => {
+    console.log('done');
+}).catch(err => {
     console.log(err.message);
-  });
+})); 
